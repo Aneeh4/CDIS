@@ -1,4 +1,1 @@
-streamlit
-transformers
-pymongo
-torch
+
