@@ -1,0 +1,402 @@
+SALESFORCE:
+  EARNINGS:
+    synonyms:
+      NET REVENUE:
+        terms:
+          - TOTAL REVENUE
+          - SUBSCRIPTION & SUPPORT REVENUE
+          - PROFESSIONAL SERVICES REVENUE
+        type: ACTUAL
+        value_format: CURRENCY
+
+      GROSS PROFIT:
+        terms: 
+          - GROSS PROFIT
+        type: ACTUAL
+        value_format: CURRENCY
+
+      GM/NR:
+        terms: 
+          - GROSS MARGIN
+          - GROSS PROFIT MARGIN
+        type: CAL_ACTUAL
+        value_format: PERCENTAGE
+
+      BACKLOG:
+        terms: 
+          - REMAINING PERFORMANCE OBLIGATION
+          - RPO
+          - CURRENT RPO
+          - NONCURRENT RPO
+        type: ACTUAL
+        value_format: CURRENCY
+
+      OPERATING PROFIT:
+        terms: 
+          - OPERATING PROFIT
+          - OPERATING INCOME
+          - INCOME FROM OPERATIONS
+        type: ACTUAL
+        value_format: CURRENCY
+
+      SEGMENT OPERATING PROFIT MARGIN:
+        terms: 
+          - GAAP OPERATING MARGIN
+          - NON-GAAP OPERATING MARGIN
+        type: ACTUAL
+        value_format: PERCENTAGE
+
+      ADJ. EBITDA:
+        terms: 
+          - NON-GAAP INCOME FROM OPERATIONS
+          - ADJUSTED EBITDA
+        type: ACTUAL
+        value_format: CURRENCY
+
+      ADJ. EBITDA MARGIN:
+        terms: 
+          - NON-GAAP OPERATING MARGIN
+          - ADJUSTED OPERATING MARGIN
+        type: ACTUAL
+        value_format: PERCENTAGE
+
+      ADJ. EPS:
+        terms:
+          - NON-GAAP EPS
+          - NON-GAAP DILUTED NET INCOME PER SHARE
+          - ADJUSTED EARNINGS PER SHARE
+        type: ACTUAL
+        value_format: CURRENCY
+
+      FCF:
+        terms: 
+          - FREE CASH FLOW
+          - FCF
+        type: ACTUAL
+        value_format: CURRENCY
+
+    metric_prompt: |
+      Extract the following metrics from a Salesforce quarterly earnings release (press release, tables, or filings).
+      Focus on CURRENT QUARTER actuals (three months ended).
+      - Use Non-GAAP where both GAAP and Non-GAAP exist (e.g., margins, EPS).
+      - If a metric is expressed as a range, use the midpoint.
+      - For RPO, take "Current Remaining Performance Obligation" (cRPO) unless otherwise specified.
+      - Normalize currency into $M. If billions → ×1000; if thousands → ÷1000.
+      - EPS values remain in $ (exact decimals).
+      - Percentages should be numeric only.
+      Output exactly the JSON array (one object per metric), keeping the specified keys and order.
+
+ACCENTURE:
+  EARNINGS:
+    synonyms:
+      REVENUE:
+        terms: 
+          - REVENUE
+          - TOTAL REVENUES
+          - NET REVENUE
+          - REVENUES BY TYPE OF WORK
+        type: ACTUAL
+        value_format: CURRENCY
+      GROSS PROFIT:
+        terms: 
+          - GROSS PROFIT
+          - GROSS PROFIT VALUE
+        type: CAL_ACTUAL
+        value_format: CURRENCY
+        depends_on: ["REVENUE", "COST OF SERVICES"]
+        formula: "REVENUE - COST OF SERVICES"
+      GM/NR:
+        terms: 
+          - GM/NR
+          - GROSS MARGIN
+          - GROSS MARGIN %
+          - GROSS PROFIT MARGIN
+        type: CAL_ACTUAL
+        value_format: PERCENTAGE
+      BOOK TO BILL:
+        terms: 
+          - BOOK TO BILL
+          - BOOKINGS TO BILLINGS RATIO
+        type: CAL_ACTUAL
+        value_format: PLAIN_NUMBER
+        depends_on: ["BOOKINGS", "REVENUE"]
+        formula: "BOOKINGS / REVENUE"
+      OPERATING PROFIT:
+        terms: 
+          - OPERATING PROFIT
+          - OPERATING INCOME
+        type: ACTUAL
+        value_format: CURRENCY
+      OPERATING PROFIT MARGIN:
+        terms: 
+          - OPERATING PROFIT MARGIN
+          - OPERATING MARGIN
+        type: ACTUAL
+        value_format: PERCENTAGE
+      EBITDA:
+        terms: 
+          - EBITDA
+        type: CAL_ACTUAL
+        value_format: CURRENCY
+        depends_on: ["OPERATING PROFIT", "D&A"]
+        formula: "OPERATING PROFIT + D&A"
+      EBITDA MARGIN:
+        terms: 
+          - EBITDA MARGIN
+        type: CAL_ACTUAL
+        value_format: PERCENTAGE
+        depends_on: ["EBITDA", "REVENUE"]
+        formula: "(EBITDA / REVENUE) * 100"
+      ADJUSTED EPS:
+        terms: 
+          - ADJUSTED EPS
+          - DILUTED EPS
+          - EARNINGS PER SHARE
+        type: ACTUAL
+        value_format: CURRENCY
+      FCF:
+        terms: 
+          - FCF
+          - FREE CASH FLOW
+        type: ACTUAL
+        value_format: CURRENCY
+    derived_supporting_terms:
+      COST OF SERVICES:
+        terms: 
+          - COST OF SERVICES
+        value_format: CURRENCY
+
+      BOOKINGS:
+        terms:
+          - NEW BOOKINGS
+        value_format: CURRENCY
+
+      D&A:
+        terms:
+          - DEPRECIATION
+        value_format: PLAIN_NUMBER
+
+    metric_prompt: |
+      Extract the following financial metrics from an Accenture quarterly earnings document
+      (press release, deck, or SEC filing). Return exactly the JSON array shown at the end —
+      no prose, no extra keys, no omissions.
+
+      SCOPE
+      - Extract values for the CURRENT quarter actuals (the column labeled
+        “Three months ended <current quarter end date>”).
+      - Ignore all prior-period, year-to-date, or full-year columns.
+      - If a metric is shown as a range, return the midpoint.
+      - If both range and single value exist, use the single value.
+
+      VOCAB (canonical → synonyms)
+      - Revenue → ["REVENUE","TOTAL REVENUES","NET REVENUE","REVENUES BY TYPE OF WORK"]
+      - Gross Profit → ["GROSS PROFIT","GROSS PROFIT VALUE"]
+      - GM/NR → ["GM/NR","GROSS MARGIN","GROSS MARGIN %","GROSS PROFIT MARGIN"]
+      - Book to Bill → ["BOOK TO BILL","BOOKINGS TO BILLINGS RATIO"]
+      - Operating Profit → ["OPERATING PROFIT","OPERATING INCOME"]
+      - Operating Profit Margin → ["OPERATING PROFIT MARGIN","OPERATING MARGIN"]
+      - EBITDA → ["EBITDA"]
+      - EBITDA Margin → ["EBITDA MARGIN"]
+      - Adjusted EPS → ["ADJUSTED EPS","DILUTED EPS","EARNINGS PER SHARE"]
+      - FCF → ["FCF","FREE CASH FLOW"]
+
+      SUPPORTING TERMS (used only to compute, never output directly):
+      - Cost of Services → ["COST OF SERVICES"]
+      - Bookings → ["NEW BOOKINGS"]
+      - D&A → ["DEPRECIATION","AMORTIZATION"]
+
+      DERIVATIONS
+      - Gross Profit (preferred) = (GM/NR × Revenue) ÷ 100
+      - Gross Profit (fallback) = Revenue − Cost of Services
+      - GM/NR (%) = (Gross Profit ÷ Revenue) × 100
+      - Book to Bill = Bookings ÷ Revenues
+      - EBITDA = Operating Profit + D&A
+      - Operating Profit Margin (%) = (Operating Profit ÷ Revenues) × 100
+      - EBITDA Margin (%) = (EBITDA ÷ Revenues) × 100
+
+      SPECIAL RULES
+      - Gross Profit:
+        - Must first be computed as (GM/NR × Revenue ÷ 100).
+        - If GM/NR is not available, fall back to Revenue − Cost of Services.
+        - Report in $M, rounded to nearest integer.
+        - value_type = "CAL_ACTUAL".
+      
+      - Adjusted EPS:
+        - Must ALWAYS be extracted from the "Adjusted" or "Non-GAAP" EPS column/row.
+        - If both Adjusted and GAAP EPS are shown, prefer Adjusted.
+        - Unit must be "$", value_type must be "ACTUAL".
+
+      NORMALIZATION
+      - Currency → $M (millions). Convert consistently.
+      - Percent → numeric only (strip “%”).
+      - Ratio → numeric only (strip “x”).
+      - EPS → numeric (dollars).
+      - Strip commas and non-numeric characters except “-” and “.”.
+
+      OUTPUT RULES
+      - Return one object per metric, in this exact order.
+      - Keys: "metric","value","unit","value_type".
+      - Do not omit metrics; use null if unavailable.
+      - Units and value_type must match exactly.
+
+      OUTPUT FORMAT
+      [
+        {"metric":"Revenue","value": <number|null>,"unit":"$M","value_type":"ACTUAL"},
+        {"metric":"Gross Profit","value": <number|null>,"unit":"$M","value_type":"CAL_ACTUAL"},
+        {"metric":"GM/NR","value": <number|null>,"unit":"%","value_type":"CAL_ACTUAL"},
+        {"metric":"Book to Bill","value": <number|null>,"unit":"ratio","value_type":"CAL_ACTUAL"},
+        {"metric":"Operating Profit","value": <number|null>,"unit":"$M","value_type":"ACTUAL"},
+        {"metric":"Operating Profit Margin","value": <number|null>,"unit":"%","value_type":"ACTUAL"},
+        {"metric":"EBITDA","value": <number|null>,"unit":"$M","value_type":"CAL_ACTUAL"},
+        {"metric":"EBITDA Margin","value": <number|null>,"unit":"%","value_type":"CAL_ACTUAL"},
+        {"metric":"Adjusted EPS","value": <number|null>,"unit":"$","value_type":"ACTUAL"},
+        {"metric":"FCF","value": <number|null>,"unit":"$M","value_type":"ACTUAL"}
+      ]
+
+AECOM:
+  EARNINGS:
+    synonyms:
+      NET REVENUE:
+        terms:
+          - NET REVENUE 
+          - NET SERVICE REVENUE (NSR)
+          - ADJUSTED NET SERVICE REVENUE
+          - ADJUSTED (NON GAAP)
+          - SEGMENT NET SERVICE REVENUE
+        type: ACTUAL
+        value_format: CURRENCY
+
+      GROSS PROFIT:
+        terms: 
+          - GROSS PROFIT
+        type: ACTUAL
+        value_format: CURRENCY
+
+      GM/NR:
+        terms: 
+          - GROSS MARGIN
+          - GM/NR
+          - GROSS PROFIT MARGIN
+          - GROSS MARGIN %
+          - GROSS PROFIT AS A % OF REVENUE
+        type: CAL_ACTUAL
+        value_format: PERCENTAGE
+
+      BACKLOG:
+        terms: 
+          - TOTAL BACKLOG
+          - BACKLOG
+          - AWARDED BACKLOG
+          - DESIGN BACKLOG
+          - CONTRACTED BACKLOG
+        type: ACTUAL
+        value_format: CURRENCY
+
+      OPERATING PROFIT:
+        terms: 
+          - OPERATING PROFIT
+          - OPERATING INCOME
+          - INCOME FROM OPERATIONS
+        type: ACTUAL
+        value_format: CURRENCY
+
+      SEGMENT OPERATING PROFIT MARGIN:
+        terms: 
+          - SEGMENT OPERATING MARGIN
+          - SEGMENT OPERATING PROFIT MARGIN
+          - SEGMENT ADJUSTED OPERATING MARGIN
+          - SEGMENT ADJUSTED MARGIN
+        type: ACTUAL
+        value_format: PERCENTAGE
+
+      ADJ. EBITDA:
+        terms: 
+          - ADJ EBITDA 
+          - EBITDA WITH NONCONTROLLING INTERESTS
+          - ADJUSTED EBITDA WITH NONCONTROLLING INTERESTS
+        type: ACTUAL
+        value_format: CURRENCY
+
+      ADJ. EBITDA MARGIN:
+        terms: 
+          - EBITDA
+          - EBITDA MARGIN
+          - ADJUSTED EBITDA MARGIN
+          - SEGMENT ADJUSTED EBITDA MARGIN
+          - EBITDA MARGIN WITH NCI
+        type: ACTUAL
+        value_format: PERCENTAGE
+
+      ADJ. EPS:
+        terms:
+          - EPS
+          - ADJ EPS
+          - ADJUSTED EARNINGS PER SHARE
+          - EPS (FULLY DILUTED)
+          - NET INCOME PER SHARE (ADJUSTED)
+        type: ACTUAL
+        value_format: CURRENCY
+
+      FCF:
+        terms: 
+          - FREE CASH FLOW
+          - FCF
+          - FREE CASHFLOW
+          - OPERATING CASH FLOW LESS CAPEX
+        type: ACTUAL
+        value_format: CURRENCY
+
+    metric_prompt: |
+      Extract the following metrics from an AECOM quarterly earnings document (press release, slides, or filing).
+      Return exactly the JSON array shown at the end—no prose, no extra keys, no omissions.
+
+      SCOPE
+      - Extract values for the CURRENT quarter actuals (e.g., “Three Months Ended <current period>”).
+      - Ignore prior periods; they can inform context but must not be the returned values.
+      - If a metric is shown as a range, return the midpoint. If both range and single value exist, use the single value.
+      - If a value is explicitly present in the source, extract it **exactly as it is shown** (do not modify or approximate).
+      - When both “Reported” and “Adjusted” values exist, **always extract from the Adjusted column**. Ignore Reported values completely.
+
+      VOCAB (canonical → synonyms)
+      - Net Revenue → ["NET REVENUE","NET SERVICE REVENUE (NSR)","ADJUSTED NET SERVICE REVENUE","ADJUSTED (NON GAAP)","SEGMENT NET SERVICE REVENUE"]
+      - Gross Profit → ["GROSS PROFIT"]
+      - GM/NR → ["GROSS MARGIN","GM/NR","GROSS PROFIT MARGIN","GROSS MARGIN %","GROSS PROFIT AS A % OF REVENUE"]
+      - Backlog → ["TOTAL BACKLOG","BACKLOG","AWARDED BACKLOG","DESIGN BACKLOG","CONTRACTED BACKLOG"]
+      - Operating Profit → ["OPERATING INCOME","INCOME FROM OPERATIONS"]
+      - Segment Operating Profit Margin → ["SEGMENT OPERATING MARGIN","SEGMENT OPERATING PROFIT MARGIN","SEGMENT ADJUSTED OPERATING MARGIN","SEGMENT ADJUSTED MARGIN"]
+      - Adj. EBITDA → ["ADJ EBITDA","EBITDA WITH NONCONTROLLING INTERESTS","ADJUSTED EBITDA WITH NONCONTROLLING INTERESTS"]
+      - Adj. EBITDA Margin → ["EBITDA","EBITDA MARGIN","ADJUSTED EBITDA MARGIN","SEGMENT ADJUSTED EBITDA MARGIN","EBITDA MARGIN WITH NCI"]
+      - Adj. EPS → ["EPS","ADJ EPS","ADJUSTED EARNINGS PER SHARE","EPS (FULLY DILUTED)","NET INCOME PER SHARE (ADJUSTED)"]
+      - FCF → ["FREE CASH FLOW","FCF","FREE CASHFLOW","OPERATING CASH FLOW LESS CAPEX"]
+
+      DERIVATIONS
+      - GM/NR (%) = (Gross Profit ÷ Net Revenue) × 100
+
+      NORMALIZATION
+      - Currency → output in $M. If source shows $ billions, multiply by 1000; if $ thousands, divide by 1000.
+      - Percent → numeric only (e.g., 9.4; unit will be “%”).
+      - Ratio → numeric only (strip trailing “x”); unit “ratio”.
+      - EPS → dollars (e.g., 1.04) with unit “$”.
+      - Strip commas and non-numeric characters except “-” and “.”.
+
+      OUTPUT RULES
+      - Output one object per canonical metric below, in this exact order.
+      - Keys: "metric","value","unit","value_type".
+      - value_type: ACTUAL or CAL_ACTUAL as specified in config.
+      - If a metric cannot be found or computed, set "value": null (keep the object).
+
+      RETURN ONLY THIS JSON ARRAY (fill the "value" fields; keep units/value_type exactly as shown):
+
+      [
+        {"metric":"Net Revenue","value": <number|null>,"unit":"$M","value_type":"ACTUAL"},
+        {"metric":"Gross Profit","value": <number|null>,"unit":"$M","value_type":"ACTUAL"},
+        {"metric":"GM/NR","value": <number|null>,"unit":"%","value_type":"CAL_ACTUAL"},
+        {"metric":"Backlog","value": <number|null>,"unit":"$M","value_type":"ACTUAL"},
+        {"metric":"Operating Profit","value": <number|null>,"unit":"$M","value_type":"ACTUAL"},
+        {"metric":"Segment Operating Profit Margin","value": <number|null>,"unit":"%","value_type":"ACTUAL"},
+        {"metric":"Adj. EBITDA","value": <number|null>,"unit":"$M","value_type":"ACTUAL"},
+        {"metric":"Adj. EBITDA Margin","value": <number|null>,"unit":"%","value_type":"ACTUAL"},
+        {"metric":"Adj. EPS","value": <number|null>,"unit":"$","value_type":"ACTUAL"},
+        {"metric":"FCF","value": <number|null>,"unit":"$M","value_type":"ACTUAL"}
+      ]
+
