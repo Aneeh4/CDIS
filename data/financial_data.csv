@@ -1,0 +1,19 @@
+Company,Quarter,Year,Revenue (in $B),Net Profit (in $B),EPS,Operating Margin (%)
+Accenture,Q1,2025,15.3,1.7,2.85,14.2
+Accenture,Q2,2025,14.9,1.5,2.60,13.8
+Accenture,Q1,2024,14.1,1.4,2.45,13.1
+Accenture,Q2,2024,13.9,1.3,2.30,12.9
+Accenture,Q3,2024,14.4,1.5,2.55,13.2
+Accenture,Q4,2024,15.0,1.6,2.70,13.6
+Capgemini,Q1,2025,6.1,0.7,1.80,11.9
+Capgemini,Q2,2025,6.3,0.8,1.95,12.3
+Capgemini,Q1,2024,5.8,0.6,1.70,11.2
+Capgemini,Q2,2024,5.9,0.6,1.75,11.4
+Capgemini,Q3,2024,6.0,0.7,1.80,11.6
+Capgemini,Q4,2024,6.2,0.7,1.85,11.8
+Deloitte,Q1,2025,8.9,1.1,2.10,13.5
+Deloitte,Q2,2025,9.2,1.2,2.25,13.8
+Deloitte,Q1,2024,8.5,1.0,2.00,13.0
+Deloitte,Q2,2024,8.6,1.0,2.05,13.1
+Deloitte,Q3,2024,8.7,1.1,2.10,13.2
+Deloitte,Q4,2024,8.8,1.1,2.15,13.3
