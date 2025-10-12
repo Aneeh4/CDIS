@@ -125,3 +125,74 @@ def insert_summary(record):
     )
     execute_non_query(query, params)
     print(f"✅ Summary saved for: {record['title']}")
+
+# -----------------------------
+# 📊 Financial Data Section
+# -----------------------------
+FIN_TABLE = "financial_data"
+
+def create_financial_table():
+    """
+    Creates the financial_data table if it does not exist.
+    Each metric is stored as a separate row.
+    """
+    query = f"""
+    CREATE TABLE IF NOT EXISTS {FIN_TABLE} (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        company VARCHAR(255),
+        quarter VARCHAR(10),
+        year VARCHAR(10),
+        metric_name VARCHAR(255),
+        metric_value DECIMAL(30, 4),
+        unit VARCHAR(20),
+        UNIQUE KEY uq_metric (company, quarter, year, metric_name)
+    )
+    """
+    execute_non_query(query)
+
+
+def insert_financial_data(company: str, quarter: str, year: str, metrics: list):
+    """
+    Inserts multiple metrics for a company into financial_data table.
+    Each metric becomes a separate row.
+    
+    metrics: list of dicts with keys: metric, value, unit
+    Example:
+    [
+        {"metric": "Revenue", "value": 9444, "unit": "$M"},
+        {"metric": "Operating Cash Flow", "value": 1983, "unit": "$M"}
+    ]
+    """
+    for m in metrics:
+        query = f"""
+        INSERT INTO {FIN_TABLE} (company, quarter, year, metric_name, metric_value, unit)
+        VALUES (%s, %s, %s, %s, %s, %s)
+        ON DUPLICATE KEY UPDATE
+            metric_value = VALUES(metric_value),
+            unit = VALUES(unit)
+        """
+        params = (
+            company,
+            quarter.upper(),
+            str(year),
+            m.get("metric"),
+            m.get("value"),
+            m.get("unit")
+        )
+        execute_non_query(query, params)
+    print(f"✅ Inserted/Updated {len(metrics)} financial metrics for {company} {quarter} {year}")
+
+
+def get_financial_data(company: str, quarter: str, year: str):
+    """
+    Fetches financial metrics for a given company, quarter, and year.
+    Returns each metric as a separate row.
+    """
+    query = f"""
+    SELECT company, quarter, year, metric_name, metric_value, unit
+    FROM {FIN_TABLE}
+    WHERE company = %s AND quarter = %s AND year = %s
+    """
+    params = (company, quarter.upper(), str(year))
+    results = execute_query(query, params)
+    return results
