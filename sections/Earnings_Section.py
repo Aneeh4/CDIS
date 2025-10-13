@@ -139,8 +139,7 @@ def show_page():
         config = yaml.safe_load(f)
 
     companies = [k for k in config.keys() if k != "GLOBAL_DEFAULTS"]
-    selected_company = st.selectbox("Select Company", companies)
-    #api_key = 'AIzaSyB_t9RrIGjmp_Fd8_PrnGnZAfDQ2rqyDOs'  
+    selected_company = st.selectbox("Select company")
 
     selected_config = config[selected_company]
 
