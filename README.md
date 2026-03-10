@@ -48,40 +48,6 @@ Structured Database (MySQL)
 Analytics & Visualization
 Technology Stack
 
-Programming
 
-Python
-
-Data Processing
-
-ETL Pipelines
-
-Regex extraction
-
-RapidFuzz
-
-NLP / AI
-
-Transformer models
-
-LLM-based extraction and summarization
-
-Database
-
-MySQL
-
-Visualization
-
-Matplotlib / Plotly
 
 Power BI
-
-Applications
-
-Financial analysis and benchmarking
-
-Corporate intelligence gathering
-
-Automated report generation
-
-Predictive performance analysis
