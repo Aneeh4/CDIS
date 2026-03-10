@@ -36,18 +36,25 @@ Provides dashboards and analytics through Python visualizations and Power BI.
 
 System Workflow
 Data Sources
+
    ↓
+   
+ 
 Web Scraping
+
    ↓
+   
 Document Processing (PDF/OCR)
+
    ↓
+   
 Information Extraction (Regex + NLP + LLM)
+
    ↓
+   
 Structured Database (MySQL)
+
    ↓
+   
 Analytics & Visualization
-Technology Stack
 
-
-
-Power BI
